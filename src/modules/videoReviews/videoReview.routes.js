@@ -4,6 +4,7 @@ const videoReviewController = require("./videoReview.controller");
 const uploadVideoReview = require("../../middlewares/uploadVideoReview");
 const authMiddleware = require("../../middlewares/authMiddleware");
 
+router.post("/request-otp", videoReviewController.requestVideoReviewOtp);
 router.post(
   "/create",
   uploadVideoReview.single("video"),

@@ -12,7 +12,7 @@ const registerUser = async (payload) => {
     throw new AppError(409, "User already exists with this email");
   }
 
-  const hashedPassword = await bcrypt.hash(password, 10);
+  //   const hashedPassword = await bcrypt.hash(password, 10);
   const role =
     config.admin_email &&
     config.admin_email.toLowerCase() === email.toLowerCase()
@@ -22,7 +22,8 @@ const registerUser = async (payload) => {
   const user = await Auth.create({
     name,
     email: email.toLowerCase(),
-    password: hashedPassword,
+    // password: hashedPassword,
+    password,
     role,
   });
 
@@ -46,7 +47,7 @@ const loginUser = async (payload) => {
     throw new AppError(401, "Invalid email or password");
   }
 
-  const isPasswordMatched = await bcrypt.compare(password, user.password);
+  const isPasswordMatched = await (password, user.password);
   if (!isPasswordMatched) {
     throw new AppError(401, "Invalid email or password");
   }

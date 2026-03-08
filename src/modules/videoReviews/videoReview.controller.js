@@ -4,6 +4,7 @@ const AppError = require("../../errors/AppError");
 const sendResponse = require("../../utils/sendResponse");
 const cloudinary = require("../../config/cloudinary");
 const { Readable } = require("stream");
+const reviewOtpService = require("../reviewOtp/reviewOtp.service");
 
 const uploadVideoToCloudinary = (file) => {
   return new Promise((resolve, reject) => {
@@ -25,6 +26,19 @@ const uploadVideoToCloudinary = (file) => {
 };
 
 exports.createVideoReview = catchAsync(async (req, res, next) => {
+  const { email, otp } = req.body;
+
+  if (!email || !otp) {
+    return next(
+      new AppError(400, "Email and OTP are required to submit video review"),
+    );
+  }
+
+  await reviewOtpService.verifyOtp(email, otp, "video-review");
+
+  const payload = { ...req.body };
+  delete payload.otp;
+
   if (!req.file) {
     return next(new AppError(400, "Video file is required"));
   }
@@ -32,7 +46,7 @@ exports.createVideoReview = catchAsync(async (req, res, next) => {
   const uploadResult = await uploadVideoToCloudinary(req.file);
 
   const videoReview = await videoReviewService.createVideoReview({
-    ...req.body,
+    ...payload,
     video: uploadResult.secure_url,
   });
 
@@ -41,6 +55,23 @@ exports.createVideoReview = catchAsync(async (req, res, next) => {
     success: true,
     message: "Video review created successfully",
     data: videoReview,
+  });
+});
+
+exports.requestVideoReviewOtp = catchAsync(async (req, res, next) => {
+  const { email } = req.body;
+
+  if (!email) {
+    return next(new AppError(400, "Email is required"));
+  }
+
+  const result = await reviewOtpService.requestOtp(email, "video-review");
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "OTP sent successfully to email",
+    data: result,
   });
 });
 

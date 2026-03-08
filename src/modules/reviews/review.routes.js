@@ -4,6 +4,7 @@ const reviewController = require("./review.controller");
 const uploadReviewMedia = require("../../middlewares/uploadReviewMedia");
 const authMiddleware = require("../../middlewares/authMiddleware");
 
+router.post("/request-otp", reviewController.requestReviewOtp);
 router.post(
   "/create",
   uploadReviewMedia.array("media", 3),
