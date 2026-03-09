@@ -17,6 +17,21 @@ router.get(
 );
 router.get("/:id", videoReviewController.getVideoReviewById);
 router.patch(
+  "/:id/reply",
+  authMiddleware("admin"),
+  videoReviewController.replyToVideoReview,
+);
+router.patch(
+  "/:id/reply/edit",
+  authMiddleware("admin"),
+  videoReviewController.editVideoReviewReply,
+);
+router.delete(
+  "/:id/reply",
+  authMiddleware("admin"),
+  videoReviewController.deleteVideoReviewReply,
+);
+router.patch(
   "/:id",
   authMiddleware("admin"),
   videoReviewController.updateVideoReview,

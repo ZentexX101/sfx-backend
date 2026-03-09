@@ -12,6 +12,21 @@ router.post(
 );
 router.get("/", authMiddleware("admin"), reviewController.getAllReviews);
 router.get("/:id", reviewController.getReviewById);
+router.patch(
+  "/:id/reply",
+  authMiddleware("admin"),
+  reviewController.replyToReview,
+);
+router.patch(
+  "/:id/reply/edit",
+  authMiddleware("admin"),
+  reviewController.editReviewReply,
+);
+router.delete(
+  "/:id/reply",
+  authMiddleware("admin"),
+  reviewController.deleteReviewReply,
+);
 router.patch("/:id", authMiddleware("admin"), reviewController.updateReview);
 router.delete("/:id", authMiddleware("admin"), reviewController.deleteReview);
 

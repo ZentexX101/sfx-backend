@@ -52,6 +52,20 @@ const videoReviewSchema = new mongoose.Schema(
       enum: ["pending", "approved", "rejected"],
       default: "pending",
     },
+
+    adminReply: {
+      message: {
+        type: String,
+        trim: true,
+      },
+      repliedBy: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+      repliedAt: {
+        type: Date,
+      },
+    },
   },
   {
     timestamps: true,

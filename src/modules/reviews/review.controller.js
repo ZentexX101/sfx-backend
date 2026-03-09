@@ -25,7 +25,6 @@ const uploadToCloudinary = (file) => {
   });
 };
 
-
 exports.createReview = catchAsync(async (req, res, next) => {
   const { email, otp } = req.body;
 
@@ -62,7 +61,6 @@ exports.createReview = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.requestReviewOtp = catchAsync(async (req, res, next) => {
   const { email } = req.body;
 
@@ -80,7 +78,6 @@ exports.requestReviewOtp = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.getAllReviews = catchAsync(async (req, res, next) => {
   const result = await reviewService.getAllReviews(req.query);
   sendResponse(res, {
@@ -91,7 +88,6 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
     data: result.data,
   });
 });
-
 
 exports.getReviewById = catchAsync(async (req, res, next) => {
   const review = await reviewService.getReviewById(req.params.id);
@@ -119,7 +115,6 @@ exports.updateReview = catchAsync(async (req, res, next) => {
   });
 });
 
-
 exports.deleteReview = catchAsync(async (req, res, next) => {
   const review = await reviewService.deleteReview(req.params.id);
   if (!review) {
@@ -130,5 +125,80 @@ exports.deleteReview = catchAsync(async (req, res, next) => {
     success: true,
     message: "Review deleted successfully",
     data: null,
+  });
+});
+
+exports.replyToReview = catchAsync(async (req, res, next) => {
+  const { message } = req.body;
+
+  if (!message || !message.trim()) {
+    return next(new AppError(400, "Reply message is required"));
+  }
+
+  const review = await reviewService.replyToReview(
+    req.params.id,
+    message.trim(),
+    req.user?._id,
+  );
+
+  if (!review) {
+    return next(new AppError(404, "Review not found"));
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reply added successfully",
+    data: review,
+  });
+});
+
+exports.editReviewReply = catchAsync(async (req, res, next) => {
+  const { message } = req.body;
+
+  if (!message || !message.trim()) {
+    return next(new AppError(400, "Reply message is required"));
+  }
+
+  const existingReview = await reviewService.getReviewById(req.params.id);
+  if (!existingReview) {
+    return next(new AppError(404, "Review not found"));
+  }
+
+  if (!existingReview.adminReply?.message) {
+    return next(new AppError(404, "Reply not found"));
+  }
+
+  const review = await reviewService.editReviewReply(
+    req.params.id,
+    message.trim(),
+    req.user?._id,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reply updated successfully",
+    data: review,
+  });
+});
+
+exports.deleteReviewReply = catchAsync(async (req, res, next) => {
+  const existingReview = await reviewService.getReviewById(req.params.id);
+  if (!existingReview) {
+    return next(new AppError(404, "Review not found"));
+  }
+
+  if (!existingReview.adminReply?.message) {
+    return next(new AppError(404, "Reply not found"));
+  }
+
+  const review = await reviewService.deleteReviewReply(req.params.id);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reply deleted successfully",
+    data: review,
   });
 });

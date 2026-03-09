@@ -136,10 +136,61 @@ const deleteVideoReview = async (id) => {
   return VideoReview.findByIdAndDelete(id);
 };
 
+const replyToVideoReview = async (id, message, adminId) => {
+  return VideoReview.findByIdAndUpdate(
+    id,
+    {
+      adminReply: {
+        message,
+        repliedBy: adminId,
+        repliedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const editVideoReviewReply = async (id, message, adminId) => {
+  return VideoReview.findByIdAndUpdate(
+    id,
+    {
+      adminReply: {
+        message,
+        repliedBy: adminId,
+        repliedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const deleteVideoReviewReply = async (id) => {
+  return VideoReview.findByIdAndUpdate(
+    id,
+    {
+      $unset: {
+        adminReply: 1,
+      },
+    },
+    {
+      new: true,
+    },
+  );
+};
+
 module.exports = {
   createVideoReview,
   getAllVideoReviews,
   getVideoReviewById,
   updateVideoReview,
   deleteVideoReview,
+  replyToVideoReview,
+  editVideoReviewReply,
+  deleteVideoReviewReply,
 };

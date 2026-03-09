@@ -137,10 +137,61 @@ const deleteReview = async (id) => {
   return Review.findByIdAndDelete(id);
 };
 
+const replyToReview = async (id, message, adminId) => {
+  return Review.findByIdAndUpdate(
+    id,
+    {
+      adminReply: {
+        message,
+        repliedBy: adminId,
+        repliedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const editReviewReply = async (id, message, adminId) => {
+  return Review.findByIdAndUpdate(
+    id,
+    {
+      adminReply: {
+        message,
+        repliedBy: adminId,
+        repliedAt: new Date(),
+      },
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const deleteReviewReply = async (id) => {
+  return Review.findByIdAndUpdate(
+    id,
+    {
+      $unset: {
+        adminReply: 1,
+      },
+    },
+    {
+      new: true,
+    },
+  );
+};
+
 module.exports = {
   createReview,
   getAllReviews,
   getReviewById,
   updateReview,
   deleteReview,
+  replyToReview,
+  editReviewReply,
+  deleteReviewReply,
 };

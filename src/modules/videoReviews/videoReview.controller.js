@@ -136,3 +136,84 @@ exports.deleteVideoReview = catchAsync(async (req, res, next) => {
     data: null,
   });
 });
+
+exports.replyToVideoReview = catchAsync(async (req, res, next) => {
+  const { message } = req.body;
+
+  if (!message || !message.trim()) {
+    return next(new AppError(400, "Reply message is required"));
+  }
+
+  const videoReview = await videoReviewService.replyToVideoReview(
+    req.params.id,
+    message.trim(),
+    req.user?._id,
+  );
+
+  if (!videoReview) {
+    return next(new AppError(404, "Video review not found"));
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reply added successfully",
+    data: videoReview,
+  });
+});
+
+exports.editVideoReviewReply = catchAsync(async (req, res, next) => {
+  const { message } = req.body;
+
+  if (!message || !message.trim()) {
+    return next(new AppError(400, "Reply message is required"));
+  }
+
+  const existingReview = await videoReviewService.getVideoReviewById(
+    req.params.id,
+  );
+  if (!existingReview) {
+    return next(new AppError(404, "Video review not found"));
+  }
+
+  if (!existingReview.adminReply?.message) {
+    return next(new AppError(404, "Reply not found"));
+  }
+
+  const videoReview = await videoReviewService.editVideoReviewReply(
+    req.params.id,
+    message.trim(),
+    req.user?._id,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reply updated successfully",
+    data: videoReview,
+  });
+});
+
+exports.deleteVideoReviewReply = catchAsync(async (req, res, next) => {
+  const existingReview = await videoReviewService.getVideoReviewById(
+    req.params.id,
+  );
+  if (!existingReview) {
+    return next(new AppError(404, "Video review not found"));
+  }
+
+  if (!existingReview.adminReply?.message) {
+    return next(new AppError(404, "Reply not found"));
+  }
+
+  const videoReview = await videoReviewService.deleteVideoReviewReply(
+    req.params.id,
+  );
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Reply deleted successfully",
+    data: videoReview,
+  });
+});
