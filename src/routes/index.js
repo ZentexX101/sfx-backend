@@ -5,6 +5,7 @@ const authRoutes = require("../modules/auth/auth.routes");
 const blogRoutes = require("../modules/blogs/blog.routes");
 const reviewRoutes = require("../modules/reviews/review.routes");
 const videoReviewRoutes = require("../modules/videoReviews/videoReview.routes");
+const dashboardRoutes = require("../modules/overview/overview.routes");
 
 const moduleRoutes = [
   {
@@ -22,6 +23,10 @@ const moduleRoutes = [
   {
     path: "/video-reviews",
     route: videoReviewRoutes,
+  },
+  {
+    path: "/overview",
+    route: dashboardRoutes,
   },
 ];
 
