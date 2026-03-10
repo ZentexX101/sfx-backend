@@ -5,7 +5,7 @@ const authMiddleware = require("../../middlewares/authMiddleware");
 const router = express.Router();
 
 router.get(
-  "/overview-cards",
+  "/",
   authMiddleware("admin"),
   dashboardController.getOverviewCards,
 );
@@ -15,7 +15,7 @@ router.get(
   dashboardController.getReviewVolumeByWeek,
 );
 router.get(
-  "/review-charts",
+  "/review-status-ratings",
   authMiddleware("admin"),
   dashboardController.getReviewCharts,
 );
