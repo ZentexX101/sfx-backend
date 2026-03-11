@@ -98,6 +98,7 @@ const blogSchema = new mongoose.Schema(
       schema: {
         type: mongoose.Schema.Types.Mixed,
         default: null,
+        optional: true,
       },
     },
   },
