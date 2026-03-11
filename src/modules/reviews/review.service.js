@@ -10,6 +10,15 @@ const getAllReviews = async (query) => {
   const skip = (page - 1) * limit;
 
   const filters = {};
+  const includeArchived = query.includeArchived === "true";
+  const onlyArchived = query.onlyArchived === "true";
+
+  if (onlyArchived) {
+    filters.isArchived = true;
+  } else if (!includeArchived) {
+    // Keep old documents (without isArchived field) visible in active lists.
+    filters.isArchived = { $ne: true };
+  }
 
   if (query.status) {
     filters.status = query.status;
@@ -127,19 +136,55 @@ const getReviewById = async (id) => {
 };
 
 const updateReview = async (id, updateData) => {
-  return Review.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  return Review.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 };
 
 const deleteReview = async (id) => {
-  return Review.findByIdAndDelete(id);
+  return Review.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
+    {
+      isArchived: true,
+      archivedAt: new Date(),
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const getArchivedReviews = async (query) => {
+  return getAllReviews({ ...query, onlyArchived: "true" });
+};
+
+const restoreReview = async (id) => {
+  return Review.findOneAndUpdate(
+    { _id: id, isArchived: true },
+    {
+      isArchived: false,
+      archivedAt: null,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const permanentlyDeleteReview = async (id) => {
+  return Review.findOneAndDelete({ _id: id, isArchived: true });
 };
 
 const replyToReview = async (id, message, adminId) => {
-  return Review.findByIdAndUpdate(
-    id,
+  return Review.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
     {
       adminReply: {
         message,
@@ -155,8 +200,8 @@ const replyToReview = async (id, message, adminId) => {
 };
 
 const editReviewReply = async (id, message, adminId) => {
-  return Review.findByIdAndUpdate(
-    id,
+  return Review.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
     {
       adminReply: {
         message,
@@ -172,8 +217,8 @@ const editReviewReply = async (id, message, adminId) => {
 };
 
 const deleteReviewReply = async (id) => {
-  return Review.findByIdAndUpdate(
-    id,
+  return Review.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
     {
       $unset: {
         adminReply: 1,
@@ -191,6 +236,9 @@ module.exports = {
   getReviewById,
   updateReview,
   deleteReview,
+  getArchivedReviews,
+  restoreReview,
+  permanentlyDeleteReview,
   replyToReview,
   editReviewReply,
   deleteReviewReply,

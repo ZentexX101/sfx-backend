@@ -10,6 +10,15 @@ const getAllVideoReviews = async (query) => {
   const skip = (page - 1) * limit;
 
   const filters = {};
+  const includeArchived = query.includeArchived === "true";
+  const onlyArchived = query.onlyArchived === "true";
+
+  if (onlyArchived) {
+    filters.isArchived = true;
+  } else if (!includeArchived) {
+    // Keep old documents (without isArchived field) visible in active lists.
+    filters.isArchived = { $ne: true };
+  }
 
   if (query.status) {
     filters.status = query.status;
@@ -126,19 +135,55 @@ const getVideoReviewById = async (id) => {
 };
 
 const updateVideoReview = async (id, updateData) => {
-  return VideoReview.findByIdAndUpdate(id, updateData, {
-    new: true,
-    runValidators: true,
-  });
+  return VideoReview.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
+    updateData,
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
 };
 
 const deleteVideoReview = async (id) => {
-  return VideoReview.findByIdAndDelete(id);
+  return VideoReview.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
+    {
+      isArchived: true,
+      archivedAt: new Date(),
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const getArchivedVideoReviews = async (query) => {
+  return getAllVideoReviews({ ...query, onlyArchived: "true" });
+};
+
+const restoreVideoReview = async (id) => {
+  return VideoReview.findOneAndUpdate(
+    { _id: id, isArchived: true },
+    {
+      isArchived: false,
+      archivedAt: null,
+    },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+};
+
+const permanentlyDeleteVideoReview = async (id) => {
+  return VideoReview.findOneAndDelete({ _id: id, isArchived: true });
 };
 
 const replyToVideoReview = async (id, message, adminId) => {
-  return VideoReview.findByIdAndUpdate(
-    id,
+  return VideoReview.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
     {
       adminReply: {
         message,
@@ -154,8 +199,8 @@ const replyToVideoReview = async (id, message, adminId) => {
 };
 
 const editVideoReviewReply = async (id, message, adminId) => {
-  return VideoReview.findByIdAndUpdate(
-    id,
+  return VideoReview.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
     {
       adminReply: {
         message,
@@ -171,8 +216,8 @@ const editVideoReviewReply = async (id, message, adminId) => {
 };
 
 const deleteVideoReviewReply = async (id) => {
-  return VideoReview.findByIdAndUpdate(
-    id,
+  return VideoReview.findOneAndUpdate(
+    { _id: id, isArchived: { $ne: true } },
     {
       $unset: {
         adminReply: 1,
@@ -190,6 +235,9 @@ module.exports = {
   getVideoReviewById,
   updateVideoReview,
   deleteVideoReview,
+  getArchivedVideoReviews,
+  restoreVideoReview,
+  permanentlyDeleteVideoReview,
   replyToVideoReview,
   editVideoReviewReply,
   deleteVideoReviewReply,

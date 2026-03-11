@@ -15,6 +15,11 @@ router.get(
   authMiddleware("admin"),
   videoReviewController.getAllVideoReviews,
 );
+router.get(
+  "/archive",
+  authMiddleware("admin"),
+  videoReviewController.getArchivedVideoReviews,
+);
 router.get("/:id", videoReviewController.getVideoReviewById);
 router.patch(
   "/:id/reply",
@@ -30,6 +35,16 @@ router.delete(
   "/:id/reply",
   authMiddleware("admin"),
   videoReviewController.deleteVideoReviewReply,
+);
+router.patch(
+  "/:id/restore",
+  authMiddleware("admin"),
+  videoReviewController.restoreVideoReview,
+);
+router.delete(
+  "/:id/permanent",
+  authMiddleware("admin"),
+  videoReviewController.permanentlyDeleteVideoReview,
 );
 router.patch(
   "/:id",

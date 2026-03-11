@@ -53,6 +53,16 @@ const videoReviewSchema = new mongoose.Schema(
       default: "pending",
     },
 
+    isArchived: {
+      type: Boolean,
+      default: false,
+    },
+
+    archivedAt: {
+      type: Date,
+      default: null,
+    },
+
     adminReply: {
       message: {
         type: String,

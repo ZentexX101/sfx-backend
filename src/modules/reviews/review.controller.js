@@ -89,6 +89,18 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getArchivedReviews = catchAsync(async (req, res, next) => {
+  const result = await reviewService.getArchivedReviews(req.query);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Archived reviews retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 exports.getReviewById = catchAsync(async (req, res, next) => {
   const review = await reviewService.getReviewById(req.params.id);
   if (!review) {
@@ -123,7 +135,37 @@ exports.deleteReview = catchAsync(async (req, res, next) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Review deleted successfully",
+    message: "Review archived successfully",
+    data: null,
+  });
+});
+
+exports.restoreReview = catchAsync(async (req, res, next) => {
+  const review = await reviewService.restoreReview(req.params.id);
+
+  if (!review) {
+    return next(new AppError(404, "Archived review not found"));
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Review restored successfully",
+    data: review,
+  });
+});
+
+exports.permanentlyDeleteReview = catchAsync(async (req, res, next) => {
+  const review = await reviewService.permanentlyDeleteReview(req.params.id);
+
+  if (!review) {
+    return next(new AppError(404, "Archived review not found"));
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Review permanently deleted successfully",
     data: null,
   });
 });

@@ -11,6 +11,7 @@ router.post(
   reviewController.createReview,
 );
 router.get("/", reviewController.getAllReviews);
+router.get("/archive", reviewController.getArchivedReviews);
 router.get("/:id", reviewController.getReviewById);
 router.patch(
   "/:id/reply",
@@ -27,6 +28,8 @@ router.delete(
 
   reviewController.deleteReviewReply,
 );
+router.patch("/:id/restore", reviewController.restoreReview);
+router.delete("/:id/permanent", reviewController.permanentlyDeleteReview);
 router.patch("/:id", reviewController.updateReview);
 router.delete("/:id", reviewController.deleteReview);
 

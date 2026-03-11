@@ -12,16 +12,24 @@ const getOverviewCards = async () => {
     textRatingAgg,
     videoRatingAgg,
   ] = await Promise.all([
-    Review.countDocuments(),
-    VideoReview.countDocuments(),
-    Review.countDocuments({ status: "pending" }),
-    VideoReview.countDocuments({ status: "pending" }),
-    Review.countDocuments({ status: "rejected" }),
-    VideoReview.countDocuments({ status: "rejected" }),
+    Review.countDocuments({ isArchived: { $ne: true } }),
+    VideoReview.countDocuments({ isArchived: { $ne: true } }),
+    Review.countDocuments({ status: "pending", isArchived: { $ne: true } }),
+    VideoReview.countDocuments({
+      status: "pending",
+      isArchived: { $ne: true },
+    }),
+    Review.countDocuments({ status: "rejected", isArchived: { $ne: true } }),
+    VideoReview.countDocuments({
+      status: "rejected",
+      isArchived: { $ne: true },
+    }),
     Review.aggregate([
+      { $match: { isArchived: { $ne: true } } },
       { $group: { _id: null, averageRating: { $avg: "$rating" } } },
     ]),
     VideoReview.aggregate([
+      { $match: { isArchived: { $ne: true } } },
       { $group: { _id: null, averageRating: { $avg: "$rating" } } },
     ]),
   ]);
@@ -65,6 +73,7 @@ const getDailyCounts = async (model, startDate, endDate) => {
   const result = await model.aggregate([
     {
       $match: {
+        isArchived: { $ne: true },
         createdAt: {
           $gte: startDate,
           $lte: endDate,
@@ -152,6 +161,11 @@ const getReviewVolumeByWeek = async (query) => {
 
 const getRatingCountsByBucket = async (model) => {
   const bucketResult = await model.aggregate([
+    {
+      $match: {
+        isArchived: { $ne: true },
+      },
+    },
     {
       $bucket: {
         groupBy: "$rating",

@@ -87,6 +87,18 @@ exports.getAllVideoReviews = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getArchivedVideoReviews = catchAsync(async (req, res, next) => {
+  const result = await videoReviewService.getArchivedVideoReviews(req.query);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Archived video reviews retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 exports.getVideoReviewById = catchAsync(async (req, res, next) => {
   const videoReview = await videoReviewService.getVideoReviewById(
     req.params.id,
@@ -132,7 +144,41 @@ exports.deleteVideoReview = catchAsync(async (req, res, next) => {
   sendResponse(res, {
     statusCode: 200,
     success: true,
-    message: "Video review deleted successfully",
+    message: "Video review archived successfully",
+    data: null,
+  });
+});
+
+exports.restoreVideoReview = catchAsync(async (req, res, next) => {
+  const videoReview = await videoReviewService.restoreVideoReview(
+    req.params.id,
+  );
+
+  if (!videoReview) {
+    return next(new AppError(404, "Archived video review not found"));
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Video review restored successfully",
+    data: videoReview,
+  });
+});
+
+exports.permanentlyDeleteVideoReview = catchAsync(async (req, res, next) => {
+  const videoReview = await videoReviewService.permanentlyDeleteVideoReview(
+    req.params.id,
+  );
+
+  if (!videoReview) {
+    return next(new AppError(404, "Archived video review not found"));
+  }
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Video review permanently deleted successfully",
     data: null,
   });
 });
