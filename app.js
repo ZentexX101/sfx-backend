@@ -8,6 +8,38 @@ const config = require("./src/config/config");
 
 const app = express();
 
+const defaultAllowedOrigins = [
+  "http://localhost:3000",
+  "http://localhost:5173",
+  "https://sfx-review.vercel.app",
+];
+
+const allowedOrigins = process.env.CORS_ORIGINS
+  ? process.env.CORS_ORIGINS.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean)
+  : defaultAllowedOrigins;
+
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+
+    return callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: [
+    "Origin",
+    "X-Requested-With",
+    "Content-Type",
+    "Accept",
+    "Authorization",
+  ],
+  credentials: true,
+  optionsSuccessStatus: 204,
+};
+
 const connectDB = async () => {
   if (mongoose.connection.readyState === 1) return;
   if (mongoose.connection.readyState === 2) {
@@ -22,7 +54,8 @@ const connectDB = async () => {
 
 // parser
 app.use(express.json());
-app.use(cors());
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 
 // ensure database connection for serverless requests
 app.use(async (req, res, next) => {
