@@ -25,7 +25,7 @@ const uploadVideoReview = multer({
   fileFilter,
   limits: {
     files: 1,
-    fileSize: 70 * 1024 * 1024,
+    fileSize: 100 * 1024 * 1024,
   },
 });
 

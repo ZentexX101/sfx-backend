@@ -12,7 +12,7 @@ router.post(
 );
 router.get(
   "/",
-  authMiddleware("admin"),
+  // authMiddleware("admin"),
   videoReviewController.getAllVideoReviews,
 );
 router.get(
