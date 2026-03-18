@@ -77,7 +77,6 @@ package.json         # Dependencies & scripts
 ## 📁 /config/ (configuration files)
 
 - **`config.js`** – Centralized configuration file that loads and manages:
-
   - Environment variables (from `.env`)
   - Database connection settings
   - API keys and third-party service credentials
@@ -88,13 +87,11 @@ package.json         # Dependencies & scripts
 ## 📁 /middlewares/ (Middleware Functions)
 
 - **`errorHandler.js`** – Global error handler middleware
-
   - Catches and formats errors with a standard JSON response
   - Includes error details (description, code, and message)
   - Logs errors to the console with a timestamp
 
 - **`authMiddleware.js`** – Authentication middleware
-
   - Handles authentication and authorization of incoming requests.
   - Verifies the presence and validity of a JWT (JSON Web Token) in the request headers.
   - Responds with an unauthorized error if the token is absent or invalid.
@@ -104,7 +101,6 @@ package.json         # Dependencies & scripts
   - Allows the request to proceed when authentication and authorization checks pass.
 
 - **`notFound.js`** – Not Found middleware
-
   - Handles requests that don't match any defined routes.
   - Returns a 404 status code with a JSON response containing an error message.
   - The error message includes the requested path and the HTTP method used.
@@ -119,22 +115,18 @@ It contains its own **model, controller, services, and routes**, maintaining a c
 #### 📄 **Files in the `test` Module**
 
 - **`test.model.js`**
-
   - Defines the Mongoose schema for `Test`.
   - Manages the structure and validation of test-related data.
 
 - **`test.controller.js`**
-
   - Handles HTTP requests and responses.
   - Calls the service layer for business logic execution.
 
 - **`test.services.js`**
-
   - Implements core business logic for the `Test` module.
   - Interacts with the `test.model.js` to process data operations.
 
 - **`test.routes.js`**
-
   - Defines API endpoints for the `Test` module.
   - Connects routes with the corresponding controller functions.
 
@@ -143,14 +135,12 @@ It contains its own **model, controller, services, and routes**, maintaining a c
 ## 📁 /routes/ index.js
 
 - **`index.js`** – API routes setup
-
   - This file defines the routing structure for the application, registering various module routes.
   - **Centralizes route handling** by dynamically linking module routes under specified paths.
 
 #### 🔹 **Route Configuration**
 
 - **`moduleRoutes`**
-
   - An array of objects, where each object contains:
     - **`path`**: The base URL path for the module (e.g., `/test`).
     - **`route`**: The imported route handler for the module (e.g., `TestRoutes`).
@@ -170,7 +160,6 @@ It contains its own **model, controller, services, and routes**, maintaining a c
 ## 📁 /utils/ (Utility Functions)
 
 - **`catchAsync.js`** – Asynchronous error handler middleware
-
   - Wraps asynchronous route handlers and middleware to catch errors automatically.
   - Eliminates the need for repetitive `try...catch` blocks in async functions.
   - Uses `Promise.resolve()` to handle both synchronous and asynchronous errors.
@@ -179,19 +168,18 @@ It contains its own **model, controller, services, and routes**, maintaining a c
 
     ```javascript
     const createTestHandler = catchAsync(async (req, res) => {
-    	const result = await testService.createTest(req.body);
+      const result = await testService.createTest(req.body);
 
-    	sendResponse(res, {
-    		statusCode: StatusCodes.CREATED,
-    		success: true,
-    		message: "Test created successfully",
-    		data: result,
-    	});
+      sendResponse(res, {
+        statusCode: StatusCodes.CREATED,
+        success: true,
+        message: "Test created successfully",
+        data: result,
+      });
     });
     ```
 
 - **`sendResponse.js`** – Standardized response handler
-
   - Formats and sends JSON responses in a consistent structure.
   - Takes the `res` (response object) and `data` (response details) as parameters.
   - Sets the HTTP status code using `data.statusCode`.
@@ -203,26 +191,23 @@ It contains its own **model, controller, services, and routes**, maintaining a c
   - Applied to controller functions:
     ```javascript
     sendResponse(res, {
-    	statusCode: StatusCodes.CREATED,
-    	success: true,
-    	message: "Test created successfully",
-    	data: result,
+      statusCode: StatusCodes.CREATED,
+      success: true,
+      message: "Test created successfully",
+      data: result,
     });
     ```
 
 - **`jwtHelper.js`** – JWT (JSON Web Token) utility functions
-
   - **Handles token generation and verification** for authentication and authorization.
   - Uses the secret key from `process.env.JWT_SECRET_KEY`.
 
   #### 🔹 `generateToken(_id, role)`
-
   - Generates a JWT for a user based on their `_id` and `role`.
   - Uses `jwt.sign()` to create a token with an expiration time of **1 hour**.
   - Returns the generated token.
 
   #### 🔹 `verifyToken(token)`
-
   - Decodes and verifies a JWT using `jwt.verify()`.
   - If the token is **valid**, it returns the decoded payload (containing `_id` and `role`).
   - If the token is **invalid** or expired, it returns `null`.
@@ -259,14 +244,12 @@ It contains its own **model, controller, services, and routes**, maintaining a c
 ## 📄 app.js
 
 - **`app.js`** – Main Express application setup
-
   - Initializes and configures the Express application.
   - Sets up middlewares, routes, and error handling.
 
 ### 🔹 **Middleware Configuration**
 
 - **`express.json()`**
-
   - Parses incoming JSON requests, allowing easy access to request body data.
 
 - **`cors()`**
@@ -275,18 +258,16 @@ It contains its own **model, controller, services, and routes**, maintaining a c
 ### 🔹 **Routes**
 
 - **`/api/v1/`**
-
   - The base route for the API, which is linked to the main router defined in `router.js`.
   - All API endpoints are prefixed with `/api/v1/`.
 
 - **`/`**
   - A simple route that responds with a welcome message:
-    - `"Welcome to Personal Finance Server V1"`
+    - `"Welcome to sfx Server V1"`
 
 ### 🔹 **Error Handlers**
 
 - **`globalErrorHandler`**
-
   - A global error handler middleware to catch all errors during the request-response cycle.
   - It is placed after all routes to handle any uncaught errors.
 
