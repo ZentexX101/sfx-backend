@@ -263,8 +263,85 @@ const getReviewCharts = async () => {
   };
 };
 
+const getCategoryStats = async (model) => {
+  const categoryResult = await model.aggregate([
+    {
+      $match: {
+        isArchived: { $ne: true },
+      },
+    },
+    {
+      $group: {
+        _id: { $toLower: "$category" },
+        category: { $first: "$category" },
+        averageRating: { $avg: "$rating" },
+        totalReviews: { $sum: 1 },
+      },
+    },
+  ]);
+
+  return categoryResult.map((item) => ({
+    category: item.category,
+    averageRating: item.averageRating || 0,
+    totalReviews: item.totalReviews || 0,
+  }));
+};
+
+const getReviewCategoryRatings = async () => {
+  const [textCategoryStats, videoCategoryStats] = await Promise.all([
+    getCategoryStats(Review),
+    getCategoryStats(VideoReview),
+  ]);
+
+  const categoryMap = new Map();
+
+  const upsertCategory = (item) => {
+    if (!item.category) {
+      return;
+    }
+
+    const key = item.category.toLowerCase();
+    if (!categoryMap.has(key)) {
+      categoryMap.set(key, {
+        category: item.category,
+        totalReviews: 0,
+        totalRating: 0,
+      });
+    }
+
+    const existing = categoryMap.get(key);
+    existing.totalReviews += item.totalReviews;
+    existing.totalRating += item.averageRating * item.totalReviews;
+  };
+
+  textCategoryStats.forEach(upsertCategory);
+  videoCategoryStats.forEach(upsertCategory);
+
+  const categories = Array.from(categoryMap.values())
+    .map((item) => ({
+      category: item.category,
+      totalReviews: item.totalReviews,
+      averageRating:
+        item.totalReviews > 0
+          ? Number((item.totalRating / item.totalReviews).toFixed(2))
+          : 0,
+    }))
+    .sort((a, b) => {
+      if (b.totalReviews === a.totalReviews) {
+        return a.category.localeCompare(b.category);
+      }
+      return b.totalReviews - a.totalReviews;
+    });
+
+  return {
+    totalCategories: categories.length,
+    categories,
+  };
+};
+
 module.exports = {
   getOverviewCards,
   getReviewVolumeByWeek,
   getReviewCharts,
+  getReviewCategoryRatings,
 };

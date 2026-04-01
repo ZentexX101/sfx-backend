@@ -34,3 +34,14 @@ exports.getReviewCharts = catchAsync(async (req, res) => {
     data: result,
   });
 });
+
+exports.getReviewCategoryRatings = catchAsync(async (req, res) => {
+  const result = await dashboardService.getReviewCategoryRatings();
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Dashboard review category ratings retrieved successfully",
+    data: result,
+  });
+});
