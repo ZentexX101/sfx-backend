@@ -20,4 +20,10 @@ router.get(
   dashboardController.getReviewCharts,
 );
 
+router.get(
+  "/review-category-ratings",
+  dashboardController.getReviewCategoryRatings,
+)
+
+
 module.exports = router;
