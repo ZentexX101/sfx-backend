@@ -10,6 +10,7 @@ router.post(
   uploadReviewMedia.array("media", 3),
   reviewController.createReview,
 );
+router.get("/combined", reviewController.getCombinedReviews);
 router.get("/", reviewController.getAllReviews);
 router.get("/archive", reviewController.getArchivedReviews);
 router.get("/:id", reviewController.getReviewById);
