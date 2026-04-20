@@ -89,6 +89,18 @@ exports.getAllReviews = catchAsync(async (req, res, next) => {
   });
 });
 
+exports.getCombinedReviews = catchAsync(async (req, res, next) => {
+  const result = await reviewService.getCombinedReviews(req.query);
+
+  sendResponse(res, {
+    statusCode: 200,
+    success: true,
+    message: "Combined reviews retrieved successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
+
 exports.getArchivedReviews = catchAsync(async (req, res, next) => {
   const result = await reviewService.getArchivedReviews(req.query);
 
