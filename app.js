@@ -12,7 +12,8 @@ const defaultAllowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
   "https://sfx-review.vercel.app",
-  "https://sfxfunded.com"
+  "https://sfxfunded.com",
+  "https://sfx-website-s8we.vercel.app",
 ];
 
 const allowedOrigins = process.env.CORS_ORIGINS
