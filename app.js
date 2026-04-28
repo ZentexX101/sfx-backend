@@ -9,11 +9,11 @@ const config = require("./src/config/config");
 const app = express();
 
 const defaultAllowedOrigins = [
-  "http://localhost:3000",
-  "http://localhost:5173",
-  "https://sfx-review.vercel.app",
   "https://sfxfunded.com",
+  "http://localhost:3000",
   "https://sfx-website-s8we.vercel.app",
+  "https://sfx-review.vercel.app",
+  "http://localhost:5173",
 ];
 
 const allowedOrigins = process.env.CORS_ORIGINS
