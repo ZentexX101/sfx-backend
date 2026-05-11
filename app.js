@@ -9,10 +9,10 @@ const config = require("./src/config/config");
 const app = express();
 
 const defaultAllowedOrigins = [
-  "https://sfxfunded.com",
   "http://localhost:3000",
   "https://sfx-website-s8we.vercel.app",
   "https://sfx-review.vercel.app",
+  "https://sfxfunded.com",
   "http://localhost:5173",
 ];
 
