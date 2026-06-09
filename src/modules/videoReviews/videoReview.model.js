@@ -38,8 +38,21 @@ const videoReviewSchema = new mongoose.Schema(
     },
     video: {
       type: String,
-      required: true,
+      required: false,
       trim: true,
+    },
+    mux: {
+      uploadId: { type: String, trim: true },
+      assetId: { type: String, trim: true },
+      status: { type: String, trim: true },
+      playbackIds: [
+        {
+          id: { type: String },
+          policy: { type: String },
+          _id: false,
+        },
+      ],
+      createdAt: { type: Date },
     },
     email: {
       type: String,
@@ -47,6 +60,13 @@ const videoReviewSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
+
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
     status: {
       type: String,
       enum: ["pending", "approved", "rejected"],
